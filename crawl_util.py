@@ -63,6 +63,7 @@ def crawl(url, h5=False, data=None, headers=None, cookies=None, auth=None, proxy
                                   allow_redirects=allow_redirects,
                                   timeout=timeout)
             content = rsp.content
+            print rsp
             headers = rsp.headers
             cookies = rsp.cookies
             if need_return_headers and need_return_cookies:

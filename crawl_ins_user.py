@@ -9,6 +9,7 @@ from urllib import quote, urlencode
 def crawl_tag(tag, cookies):
     url = 'https://www.instagram.com/explore/tags/%s/' % tag
     content = crawl_util.crawl(url)
+    print cookies
     end_cursor = re.findall(r'"end_cursor":"([^"]+)"', content)
     userids = re.findall(r'"owner":{"id":"([^"]+)"}', content)
     end_cursor = end_cursor[0] if end_cursor else ''
@@ -33,6 +34,27 @@ def crawl_tag(tag, cookies):
 
     return userids
 
+def register(email, password):
+    url = 'https://www.instagram.com/accounts/emailsignup/'
+    headers = get_headers(url)
+    api = 'https://www.instagram.com/accounts/web_create_ajax/'
+    first_name= email.split('@')[0]
+    username = first_name + '2018'
+    data = dict(email=email, password=password, username=username, first_name=first_name, seamless_login_enabled=1, tos_version='row', opt_into_one_tap=False)
+    content, cookies = crawl_util.crawl(api, data=data, headers=headers, method='post', need_return_cookies=True)
+    data = json.loads(content)
+    if 'user_id' in data:
+        return cookies
+    return None
+
+def get_headers(url):
+    content, cookies = crawl_util.crawl(url, need_return_cookies=True)
+    csrftoken = ''
+    for cookie in cookies:
+        if cookie.name == 'csrftoken':
+            csrftoken = cookie.value
+            break
+    return {'x-csrftoken': csrftoken}
 
 def crawl_user_info(userid, cookies):
     url = 'https://i.instagram.com/api/v1/users/%s/info/' % userid
@@ -41,29 +63,22 @@ def crawl_user_info(userid, cookies):
 
 def login(username, password):
     url = 'https://www.instagram.com/'
-    content, cookies = crawl_util.crawl(url, need_return_cookies=True)
-    csrftoken = ''
-    for cookie in cookies:
-        if cookie.name == 'csrftoken':
-            csrftoken = cookie.value
-            break
+    headers = get_headers(url)
     data = dict(username=username, password=password, queryParams={})
     api = 'https://www.instagram.com/accounts/login/ajax/'
-    headers = {'x-csrftoken': csrftoken}
     cookies = crawl_util.login(api, data, headers=headers, cookies=cookies)
     return cookies
 
 def crawl_user_infos(tag):
     cookies = login('viking.liu@qq.com', 'viking138246s')
     userids = crawl_tag(tag, cookies)
-    print userids
     for userid in userids:
         user_info = crawl_user_info(userid, cookies)
         user_info = json.loads(user_info)
         print user_info
-        break
 
 
 if __name__ == '__main__':
-    crawl_user_infos('marvel')
+    #crawl_user_infos('marvel')
+    print register('ad2ai2311@qq.com', 'viking123')
 
