@@ -7,7 +7,7 @@ class privateAPI():
     In future: write a comment, set like, direct messages"""
 
     followURL = "https://i.instagram.com/api/v1/friendships/create/{}/"
-    unfollowURL = "https://i.instagram.com/api/v1/friendships/destroy/{}/" 
+    unfollowURL = "https://i.instagram.com/api/v1/friendships/destroy/{}/"
     loginURL = "https://i.instagram.com/api/v1/accounts/login/"
     uploadURL = "https://i.instagram.com/api/v1/media/upload/"
     configureURL = "https://i.instagram.com/api/v1/media/configure/"
@@ -19,9 +19,9 @@ class privateAPI():
     def __init__(self, username, password):
         self.password = password
         self.username = username
-        
+
         # INITIAL CONFIG
-        self.user_agent = 'Instagram 4.1.1 Android (11/1.5.0; 285; 800x1280; samsung; GT-N7000; GT-N7000; smdkc210; en_US)'
+        self.user_agent = 'Instagram 52.0.0.8.83 Android (11/1.5.0; 285; 800x1280; samsung; GT-N7000; GT-N7000; smdkc210; en_US)'
         self.guid = str(uuid.uuid1())
         self.device_id = 'android-{}'.format(self.guid)
         self.session = requests.Session()
@@ -43,6 +43,7 @@ class privateAPI():
         )
 
         self.loginResponse = self.session.post(self.loginURL, self.payload)
+        print (self.loginResponse.json())
         # print "LOGGED IN: ", self.loginResponse.json()
 
     def upload(self, filename, description):
@@ -126,7 +127,7 @@ class privateAPI():
             return self.session.get(self.userMediaURL.format(user_id))
         else:
             return self.session.get(self.userMediaURL.format(user_id), params = {"max_id" : max_id})
- 
+
     def userInfo(self, user_id):
         return self.session.get(self.userInfoURL.format(user_id))
 
